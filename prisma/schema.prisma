@@ -1,0 +1,38 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Meal {
+  id Int @id @default(autoincrement())
+  name String @unique
+  calories Decimal  @db.Decimal(10, 2)
+  fat Decimal  @db.Decimal(10, 2)
+  protein Decimal  @db.Decimal(10, 2)
+  directions String
+  section Section
+}
+
+model Workout {
+  id Int @id @default(autoincrement())
+  name String @unique
+  minutes Decimal  @db.Decimal(10, 2)
+  caloriesBurned Decimal  @db.Decimal(10, 2)
+  description String
+}
+
+enum Section {
+  BREAKFAST
+  LUNCH
+  DINNER
+  SNACKS
+}
