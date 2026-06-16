@@ -14,11 +14,11 @@ router.get("/", async (req, res) => {
 
 router.post("/", async (req, res) => {
   try {
-    const workout = await prisma.workout.create({
-      data: workout,
-    });
+    const workout = await prisma.workout.create({ data: req.body });
+    res.status(201).json(workout);
   } catch (error) {
-    res.status(503).json({ error: "Failed to create workout" });
+    console.error(error);
+    res.status(500).json({ error: "Failed to create workout" });
   }
 });
 
