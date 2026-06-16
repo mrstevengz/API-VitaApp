@@ -12,7 +12,6 @@ Node.js REST API for Vita-App, built with **Express 5**, **Prisma 7** (using the
 | Prisma 7 | ORM + migrations (generates a **TypeScript** client) |
 | `@prisma/adapter-pg` + `pg` | Driver adapter that connects Prisma to PostgreSQL |
 | PostgreSQL | The database |
-| tsx | Runs the server and the generated `.ts` Prisma client without a build step |
 | pnpm | Package manager |
 
 ---
@@ -33,20 +32,16 @@ Node.js REST API for Vita-App, built with **Express 5**, **Prisma 7** (using the
 ### 1. Install dependencies
 From the project root (`Vita-App API/`):
 ```bash
+npm install -g pnpm
 pnpm install
 ```
 
-### 2. Create the database
-```bash
-psql -U postgres -c "CREATE DATABASE vitaapp;"
-```
-(Name it anything — just match it in the `.env` below.)
-
-### 3. Create the `.env` file
+### 2. Create the `.env` file
 Prisma and the server both read `DATABASE_URL` from a `.env` file in the project root. **This file is not committed — you must create it yourself.**
 
 ```env
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/vitaapp?schema=public"
+Example
+DATABASE_URL=postgresql://postgres:123@localhost:5432/vita-app"
 PORT=5000
 ```
 
@@ -54,26 +49,26 @@ Connection string format:
 ```
 postgresql://USER:PASSWORD@HOST:PORT/DATABASE?schema=public
 ```
-- `USER` / `PASSWORD` — your Postgres credentials.
+- `USER` / `PASSWORD` — your Postgres credentials (USER is usually `postgres`).
 - `HOST` — `localhost` for a local/Docker Postgres.
 - `PORT` — Postgres port, usually `5432` (not the API port).
 - `DATABASE` — the database you created in step 2.
 
 > If your password has special characters (`@`, `:`, `/`, `#`…), URL-encode them (e.g. `@` → `%40`).
 
-### 4. Generate the Prisma client
+### 3. Generate the Prisma client
 Reads `prisma/schema.prisma` and generates the client into `src/generated/prisma/` (as `.ts` files):
 ```bash
 pnpm prisma generate
 ```
 
-### 5. Run migrations (create the tables)
+### 4. Run migrations (create the tables)
 ```bash
 pnpm prisma migrate dev
 ```
 If prompted for a migration name, type something like `init`.
 
-### 6. Start the server
+### 5. Start the server
 ```bash
 pnpm dev
 ```
@@ -82,7 +77,7 @@ You should see:
 Server started on 5000
 ```
 
-### 7. Verify it works
+### 6. Verify it works
 ```bash
 curl http://localhost:5000/api/meals
 ```
@@ -174,22 +169,6 @@ curl -X POST http://localhost:5000/api/workouts \
   -H "Content-Type: application/json" \
   -d '{"name":"Morning run","minutes":30,"caloriesBurned":280,"description":"Easy 5k"}'
 ```
-
-> **Known issue:** the `POST /api/workouts` handler currently has a bug — it references an undefined `workout` variable (`data: workout`) and never sends a response, so creating a workout fails. Fix it the same way as the meals handler:
-> ```js
-> router.post("/", async (req, res) => {
->   try {
->     const workout = await prisma.workout.create({ data: req.body });
->     res.status(201).json(workout);
->   } catch (error) {
->     console.error(error);
->     res.status(500).json({ error: "Failed to create workout" });
->   }
-> });
-> ```
-
----
-
 ## Project structure
 
 ```
