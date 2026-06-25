@@ -14,11 +14,18 @@ const router = express.Router();
  *      properties:
  *        id:       { type: integer, example: 1 }
  *        name:     { type: string, example: "Pizza" }
- *        calories: { type: string, example: "250", description: "Decimal serializado como string, en gramos" }
- *        carbs:    { type: string, example: "10.5", description: "Decimal serializado como string, en kcal" }
- *        fat:      { type: string, example: "20.1", description: "Decimal serializado como string, en gramos" }
- *        protein:  { type: string, example: "25", description: "Decimal serializado como string, en gramos" }
+ *        calories: { type: string, example: "250", description: "Decimal serializado como string, en kcal/100g" }
+ *        carbs:    { type: string, example: "10.5", description: "Decimal serializado como string, en gramos/100g" }
+ *        fat:      { type: string, example: "20.1", description: "Decimal serializado como string, en gramos/100g" }
+ *        protein:  { type: string, example: "25", description: "Decimal serializado como string, en gramos/100g" }
  *      required: [id, name, calories, carbs, fat, protein]
+ *    Section:
+ *      type: string
+ *      enum:
+ *        - BREAKFAST
+ *        - LUNCH
+ *        - DINNER
+ *        - SNACKS
  */
 
 /**
@@ -37,7 +44,7 @@ const router = express.Router();
  *              type: array
  *              items:
  *                $ref: '#/components/schemas/Meal'
- *      503:
+ *      500:
  *        description: Failed to fetch
  */
 
@@ -58,8 +65,8 @@ router.get("/", async (req, res) => {
  *      type: object
  *      properties:
  *        name:     { type: string, example: "Cheese Pizza", description: "El nombre de la comida debe ser unico" }
- *        calories: { type: string, example: "250", description: "Decimal serializado como string, en gramos" }
- *        carbs:    { type: string, example: "10.5", description: "Decimal serializado como string, en kcal" }
+ *        calories: { type: string, example: "250", description: "Decimal serializado como string, en kcal" }
+ *        carbs:    { type: string, example: "10.5", description: "Decimal serializado como string, en gramos" }
  *        fat:      { type: string, example: "20.1", description: "Decimal serializado como string, en gramos" }
  *        protein:  { type: string, example: "25", description: "Decimal serializado como string, en gramos" }
  *      required: [name, calories, carbs, fat, protein]
@@ -144,11 +151,6 @@ router.post("/", async (req, res) => {
  *      name: id
  *      required: true
  *      schema: { type: integer }
- *    requestBody:
- *      required: true
- *      content:
- *        application/json:
- *          schema: { type: integer }
  *    responses:
  *      200:
  *        description: El meal fue borrado

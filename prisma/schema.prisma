@@ -33,11 +33,20 @@ model DiaryEntry {
 }
 
 model Workout {
-  id             Int     @id @default(autoincrement())
-  name           String  @unique
-  minutes        Decimal @db.Decimal(10, 2)
-  caloriesBurned Decimal @db.Decimal(10, 2)
-  description    String
+  id              Int            @id @default(autoincrement())
+  name            String         @unique
+  caloriesPerHour Decimal        @db.Decimal(10, 2)
+  description     String
+  entries         WorkoutEntry[]
+}
+
+model WorkoutEntry {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  workoutId Int
+  workout   Workout  @relation(fields: [workoutId], references: [id])
+  minutes   Decimal  @db.Decimal(10, 2)
+  date      DateTime @default(now())
 }
 
 enum Section {
