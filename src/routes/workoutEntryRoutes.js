@@ -5,43 +5,42 @@ import { ApiError } from "../middleware/error.js";
 
 const router = express.Router();
 
-// //Swagger docs
-// /**
-//  * @openapi
-//  * components:
-//  *  schemas:
-//  *    DiaryEntry:
-//  *      type: object
-//  *      properties:
-//  *        id:       { type: integer, example: 1 }
-//  *        userId:     { type: integer, example: 1, description: "Numero que sirve como el ID del usuario en el auth" }
-//  *        mealId: { type: integer, example: 1, description: "Numero que apunta al meal deseado" }
-//  *        meal:    { $ref: '#/components/schemas/Meal' }
-//  *        grams:      { type: string, example: "20.1", description: "Decimal serializado como string, en gramos" }
-//  *        section:  { $ref: '#/components/schemas/Section' }
-//  *        date:  { type: string, format: date-time, example: "2026-06-24T10:00:00" }
-//  *      required: [id, userId, mealId, meal, grams, section, date]
-//  */
+//Swagger docs
+/**
+ * @openapi
+ * components:
+ *  schemas:
+ *    WorkoutEntry:
+ *      type: object
+ *      properties:
+ *        id:         { type: integer, example: 1 }
+ *        userId:     { type: integer, example: 1, description: "Numero que sirve como el ID del usuario en el auth" }
+ *        workoutId:  { type: integer, example: 1, description: "Numero que apunta al workout deseado" }
+ *        workout:    { $ref: '#/components/schemas/Workout' }
+ *        minutes:    { type: string, example: "62.5", description: "Decimal serializado como string" }
+ *        date:  { type: string, format: date-time, example: "2026-06-24T10:00:00" }
+ *      required: [id, userId, workoutId, workout, minutes, date]
+ */
 
-// /**
-//  * @openapi
-//  * /entries:
-//  *  get:
-//  *    tags: [DiaryEntries]
-//  *    summary: Lista de todos los DiaryEntries
-//  *    security: [] #Public endpoint
-//  *    responses:
-//  *      200:
-//  *        description: Una lista de DiaryEntries
-//  *        content:
-//  *          application/json:
-//  *            schema:
-//  *              type: array
-//  *              items:
-//  *                $ref: '#/components/schemas/DiaryEntry'
-//  *      500:
-//  *        description: Failed to fetch
-//  */
+/**
+ * @openapi
+ * /workouts-entries:
+ *  get:
+ *    tags: [WorkoutEntries]
+ *    summary: Lista de todos los WorkoutEntries
+ *    security: [] #Public endpoint
+ *    responses:
+ *      200:
+ *        description: Una lista de WorkoutEntries
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: array
+ *              items:
+ *                $ref: '#/components/schemas/WorkoutEntry'
+ *      500:
+ *        description: Failed to fetch
+ */
 
 //Rutas
 
@@ -54,45 +53,44 @@ router.get("/", async (req, res) => {
   res.json(workoutEntries);
 });
 
-// /**
-//  * @openapi
-//  * components:
-//  *  schemas:
-//  *    DiaryEntryInput:
-//  *      type: object
-//  *      properties:
-//  *        mealId: { type: integer, example: 1, description: "Numero que apunta al meal deseado" }
-//  *        grams:      { type: string, example: "20.1", description: "Decimal serializado como string, en gramos" }
-//  *        section:  { $ref: '#/components/schemas/Section' }
-//  *      required: [mealId, grams, section]
-//  */
+/**
+ * @openapi
+ * components:
+ *  schemas:
+ *    WorkoutEntryInput:
+ *      type: object
+ *      properties:
+ *        workoutId: { type: integer, example: 1, description: "Numero que apunta al workout deseado" }
+ *        minutes:   { type: string, example: "55.5", description: "Decimal serializado como string, en minutos" }
+ *      required: [workoutId, minutes]
+ */
 
-// /**
-//  * @openapi
-//  * /entries:
-//  *  post:
-//  *    tags: [DiaryEntries]
-//  *    summary: Creacion de un entry nuevo (USER)
-//  *    security:
-//  *      - bearerAuth: []
-//  *    requestBody:
-//  *      required: true
-//  *      content:
-//  *        application/json:
-//  *          schema:
-//  *            $ref: '#/components/schemas/DiaryEntryInput'
-//  *    responses:
-//  *      201:
-//  *        description: El entry creado
-//  *        content:
-//  *          application/json:
-//  *            schema:
-//  *              $ref: '#/components/schemas/DiaryEntry'
-//  *      400:
-//  *        description: Fallo al crear
-//  *      401:  { description: Token invalido }
-//  *      403:  { description: Autenticado pero no es usuario}
-//  */
+/**
+ * @openapi
+ * /workouts-entries:
+ *  post:
+ *    tags: [WorkoutEntries]
+ *    summary: Creacion de un workout entry nuevo (USER)
+ *    security:
+ *      - bearerAuth: []
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *          schema:
+ *            $ref: '#/components/schemas/WorkoutEntryInput'
+ *    responses:
+ *      201:
+ *        description: El entry creado
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/WorkoutEntry'
+ *      400:
+ *        description: Fallo al crear un nuevo entry
+ *      401:  { description: Token invalido }
+ *      403:  { description: Autenticado pero no es usuario}
+ */
 
 router.post("/", async (req, res) => {
   const { workoutId, userId, minutes } = req.body ?? {};
@@ -115,51 +113,51 @@ router.post("/", async (req, res) => {
 
 // //Docs para :id
 
-// /**
-//  * @openapi
-//  * /entries/{id}:
-//  *  put:
-//  *    tags: [DiaryEntries]
-//  *    summary: Actualizar un entry de la base de datos (USER)
-//  *    security:
-//  *      - bearerAuth: []
-//  *    parameters:
-//  *    - in: path
-//  *      name: id
-//  *      required: true
-//  *      schema: { type: integer }
-//  *    requestBody:
-//  *      required: true
-//  *      content:
-//  *        application/json:
-//  *          schema: { $ref: '#/components/schemas/DiaryEntryInput' }
-//  *    responses:
-//  *      200:
-//  *        description: El entry actualizado
-//  *        content:
-//  *          application/json:
-//  *            schema: { $ref: '#/components/schemas/DiaryEntry'}
-//  *      401:  { description: Token invalido }
-//  *      403:  { description: Autenticado pero no es administrador}
-//  *      404:  { description: Entry no encontrado. ID invalido}
-//  *
-//  *  delete:
-//  *    tags: [DiaryEntries]
-//  *    summary: Borrar un entry del diario (USER)
-//  *    security:
-//  *      - bearerAuth: []
-//  *    parameters:
-//  *    - in: path
-//  *      name: id
-//  *      required: true
-//  *      schema: { type: integer }
-//  *    responses:
-//  *      200:
-//  *        description: El entry fue borrado
-//  *      401:  { description: Token invalido }
-//  *      403:  { description: Autenticado pero no es administrador}
-//  *      404:  { description: Entry no encontrado. ID invalido}
-//  */
+/**
+ * @openapi
+ * /workouts-entries/{id}:
+ *  put:
+ *    tags: [WorkoutEntries]
+ *    summary: Actualizar un workout entry de la base de datos (USER)
+ *    security:
+ *      - bearerAuth: []
+ *    parameters:
+ *    - in: path
+ *      name: id
+ *      required: true
+ *      schema: { type: integer }
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *          schema: { $ref: '#/components/schemas/WorkoutEntryInput' }
+ *    responses:
+ *      200:
+ *        description: El entry actualizado
+ *        content:
+ *          application/json:
+ *            schema: { $ref: '#/components/schemas/WorkoutEntry'}
+ *      401:  { description: Token invalido }
+ *      403:  { description: Autenticado pero no es administrador}
+ *      404:  { description: Entry no encontrado. ID invalido}
+ *
+ *  delete:
+ *    tags: [WorkoutEntries]
+ *    summary: Borrar un entry del diario de workouts (USER)
+ *    security:
+ *      - bearerAuth: []
+ *    parameters:
+ *    - in: path
+ *      name: id
+ *      required: true
+ *      schema: { type: integer }
+ *    responses:
+ *      200:
+ *        description: El entry fue borrado
+ *      401:  { description: Token invalido }
+ *      403:  { description: Autenticado pero no es administrador}
+ *      404:  { description: Entry no encontrado. ID invalido}
+ */
 
 router.put("/:id", async (req, res) => {
   const { id } = req.params;

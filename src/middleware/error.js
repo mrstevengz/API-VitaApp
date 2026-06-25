@@ -26,8 +26,19 @@ export function errorHandler(err, req, res, next) {
 
   if (err.code === "P2002") {
     return res
-      .status(404)
+      .status(409)
       .json({ error: "An entry already exists with this value" });
+  }
+
+  if (err.code === "P2003") {
+    const isDelete = req.method === "DELETE";
+    return res
+      .status(isDelete ? 409 : 400)
+      .json({
+        error: isDelete
+          ? "Unable to delete: Other records reference this resource"
+          : "The referenced resource does not exist",
+      });
   }
 
   //Errores lanzados desde la app

@@ -49,12 +49,8 @@ const router = express.Router();
  */
 
 router.get("/", async (req, res) => {
-  try {
-    const meals = await prisma.meal.findMany();
-    res.json(meals);
-  } catch (error) {
-    res.status(503).json({ error: "Failed to fetch meals" });
-  }
+  const meals = await prisma.meal.findMany();
+  res.json(meals);
 });
 
 /**
@@ -100,15 +96,10 @@ router.get("/", async (req, res) => {
  */
 
 router.post("/", async (req, res) => {
-  try {
-    const meal = await prisma.meal.create({
-      data: req.body,
-    });
-    res.status(201).json(meal);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Failed to create meal" });
-  }
+  const meal = await prisma.meal.create({
+    data: req.body,
+  });
+  res.status(201).json(meal);
 });
 
 //Docs para :id
@@ -167,7 +158,7 @@ router.put("/:id", async (req, res) => {
     where: {
       id: parseInt(id),
     },
-    data: req.body,
+    data,
   });
   res.json(updatedMeal);
 });

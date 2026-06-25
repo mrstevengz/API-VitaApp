@@ -9,6 +9,6 @@ const router = express.Router();
 router.use("/meals", mealRoutes);
 router.use("/workouts", workoutRoutes);
 router.use("/entries", entryRoutes);
-router.use("/workout-entries", workoutEntryRoutes);
+router.use("/workouts-entries", workoutEntryRoutes);
 
 export default router;

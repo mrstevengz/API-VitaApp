@@ -3,24 +3,138 @@ import prisma from "../prismaClient.js";
 
 const router = express.Router();
 
+//SWAGGER DOCS
+
+/**
+ * @openapi
+ * components:
+ *  schemas:
+ *    Workout:
+ *      type: object
+ *      properties:
+ *        id:       { type: integer, example: 1 }
+ *        name:     { type: string, example: "Incline Running" }
+ *        caloriesPerHour: { type: string, example: "250.5", description: "Decimal serializado como string, en kcal/hora" }
+ *        description:    { type: string, example: "Incline treadmill run"}
+ *      required: [id, name, caloriesPerHour, description]
+ */
+
+/**
+ * @openapi
+ * /workouts:
+ *  get:
+ *    tags: [Workouts]
+ *    summary: Lista de todos los Workouts
+ *    security: [] #Public endpoint
+ *    responses:
+ *      200:
+ *        description: Una lista de workouts
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: array
+ *              items:
+ *                $ref: '#/components/schemas/Workout'
+ *      500:
+ *        description: Failed to fetch
+ */
 router.get("/", async (req, res) => {
-  try {
-    const workouts = await prisma.workout.findMany();
-    res.json(workouts);
-  } catch (error) {
-    res.status(503).json({ error: "Failed to fetch workouts" });
-  }
+  const workouts = await prisma.workout.findMany();
+  res.json(workouts);
 });
 
+/**
+ * @openapi
+ * components:
+ *  schemas:
+ *    WorkoutInput:
+ *      type: object
+ *      properties:
+ *        name:     { type: string, example: "Incline Running" }
+ *        caloriesPerHour: { type: string, example: "250.5", description: "Decimal serializado como string, en kcal/hora" }
+ *        description:    { type: string, example: "Incline treadmill run"}
+ *      required: [name, caloriesPerHour, description]
+ */
+
+/**
+ * @openapi
+ * /workouts:
+ *  post:
+ *    tags: [Workouts]
+ *    summary: Creacion de un Workout nuevo (ADMIN ONLY)
+ *    security:
+ *      - bearerAuth: []
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *          schema:
+ *            $ref: '#/components/schemas/WorkoutInput'
+ *    responses:
+ *      201:
+ *        description: El workout nuevo creado
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/Workout'
+ *      409:
+ *        description: Un workout con este nombre ya existe
+ *      500:
+ *        description: Fallo al crear un nuevo workout
+ */
+
 router.post("/", async (req, res) => {
-  try {
-    const workout = await prisma.workout.create({ data: req.body });
-    res.status(201).json(workout);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Failed to create workout" });
-  }
+  const workout = await prisma.workout.create({ data: req.body });
+  res.status(201).json(workout);
 });
+
+//Docs para :id
+
+/**
+ * @openapi
+ * /workouts/{id}:
+ *  put:
+ *    tags: [Workouts]
+ *    summary: Actualizar un Workout (ADMIN)
+ *    security:
+ *      - bearerAuth: []
+ *    parameters:
+ *    - in: path
+ *      name: id
+ *      required: true
+ *      schema: { type: integer }
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *          schema: { $ref: '#/components/schemas/WorkoutInput' }
+ *    responses:
+ *      200:
+ *        description: El workout actualizado
+ *        content:
+ *          application/json:
+ *            schema: { $ref: '#/components/schemas/Workout'}
+ *      401:  { description: Token invalido }
+ *      403:  { description: Autenticado pero no es administrador}
+ *      404:  { description: Workout no encontrado}
+ *
+ *  delete:
+ *    tags: [Workouts]
+ *    summary: Borrar un workout (ADMIN ONLY)
+ *    security:
+ *      - bearerAuth: []
+ *    parameters:
+ *    - in: path
+ *      name: id
+ *      required: true
+ *      schema: { type: integer }
+ *    responses:
+ *      200:
+ *        description: El workout fue borrado
+ *      401:  { description: Token invalido }
+ *      403:  { description: Autenticado pero no es administrador}
+ *      404:  { description: Workout no encontrado}
+ */
 
 router.put("/:id", async (req, res) => {
   const { id } = req.params;
