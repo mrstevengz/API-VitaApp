@@ -7,14 +7,14 @@ import authRouter from "./authRoutes.js";
 
 const router = express.Router();
 
+router.get("/", (req, res) => {
+  res.send("API is running");
+});
+
 router.use("/meals", mealRoutes);
 router.use("/workouts", workoutRoutes);
 router.use("/entries", entryRoutes);
 router.use("/workouts-entries", workoutEntryRoutes);
 router.use("/auth", authRouter);
-
-app.get("/", (req, res) => {
-  res.send("API is functional");
-});
 
 export default router;
