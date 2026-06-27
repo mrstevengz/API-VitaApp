@@ -13,4 +13,8 @@ router.use("/entries", entryRoutes);
 router.use("/workouts-entries", workoutEntryRoutes);
 router.use("/auth", authRouter);
 
+app.get("/", (req, res) => {
+  res.send("API is functional");
+});
+
 export default router;

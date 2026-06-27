@@ -47,7 +47,3 @@ app.use(errorHandler);
 
 //Iniciar servidor
 app.listen(PORT, () => console.log(`Server started on ${PORT}`));
-
-app.get("/", (req, res) => {
-  res.send("API is functional");
-});
