@@ -1,5 +1,6 @@
 import express from "express";
 import prisma from "../prismaClient.js";
+import { authenticate, requireAdmin } from "../middleware/auth.js";
 
 const router = express.Router();
 
@@ -95,7 +96,7 @@ router.get("/", async (req, res) => {
  *        description: Fallo al crear
  */
 
-router.post("/", async (req, res) => {
+router.post("/", authenticate, requireAdmin, async (req, res) => {
   const meal = await prisma.meal.create({
     data: req.body,
   });
@@ -150,25 +151,27 @@ router.post("/", async (req, res) => {
  *      404:  { description: Meal no encontrado}
  */
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", authenticate, requireAdmin, async (req, res) => {
   const { id } = req.params;
   const { id: _, ...data } = req.body;
 
   const updatedMeal = await prisma.meal.update({
     where: {
       id: parseInt(id),
+      userId: req.user.id,
     },
     data,
   });
   res.json(updatedMeal);
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", authenticate, requireAdmin, async (req, res) => {
   const { id } = req.params;
 
   await prisma.meal.delete({
     where: {
       id: parseInt(id),
+      userId: req.user.id,
     },
   });
 

@@ -1,5 +1,6 @@
 import express from "express";
 import prisma from "../prismaClient.js";
+import { authenticate, requireAdmin } from "../middleware/auth.js";
 
 const router = express.Router();
 
@@ -83,7 +84,7 @@ router.get("/", async (req, res) => {
  *        description: Fallo al crear un nuevo workout
  */
 
-router.post("/", async (req, res) => {
+router.post("/", authenticate, requireAdmin, async (req, res) => {
   const workout = await prisma.workout.create({ data: req.body });
   res.status(201).json(workout);
 });
@@ -136,25 +137,27 @@ router.post("/", async (req, res) => {
  *      404:  { description: Workout no encontrado}
  */
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", authenticate, requireAdmin, async (req, res) => {
   const { id } = req.params;
   const { id: _, ...data } = req.body;
 
   const updatedWorkout = await prisma.workout.update({
     where: {
       id: parseInt(id),
+      userId: req.user.id,
     },
     data,
   });
   res.json(updatedWorkout);
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", authenticate, requireAdmin, async (req, res) => {
   const { id } = req.params;
 
   await prisma.workout.delete({
     where: {
       id: parseInt(id),
+      userId: req.user.id,
     },
   });
 

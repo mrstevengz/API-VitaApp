@@ -2,8 +2,10 @@ import express from "express";
 
 import prisma from "../prismaClient.js";
 import { ApiError } from "../middleware/error.js";
+import { authenticate } from "../middleware/auth.js";
 
 const router = express.Router();
+router.use(authenticate);
 
 //Swagger docs
 /**
@@ -28,7 +30,8 @@ const router = express.Router();
  *  get:
  *    tags: [WorkoutEntries]
  *    summary: Lista de todos los WorkoutEntries
- *    security: [] #Public endpoint
+ *    security:
+ *      - bearerAuth: []
  *    responses:
  *      200:
  *        description: Una lista de WorkoutEntries
@@ -48,6 +51,7 @@ router.get("/", async (req, res) => {
   const workoutEntries = await prisma.workoutEntry.findMany({
     include: { workout: true },
     orderBy: { date: "desc" },
+    where: { userId: req.user.id },
   });
 
   res.json(workoutEntries);
@@ -93,7 +97,7 @@ router.get("/", async (req, res) => {
  */
 
 router.post("/", async (req, res) => {
-  const { workoutId, userId, minutes } = req.body ?? {};
+  const { workoutId, minutes } = req.body ?? {};
 
   if (workoutId == null || minutes == null) {
     throw new ApiError(400, "WorkoutId and minutes worked are required fields");
@@ -102,7 +106,7 @@ router.post("/", async (req, res) => {
     data: {
       workoutId,
       minutes,
-      userId: userId ?? 1,
+      userId: req.user.id,
     },
 
     include: { workout: true },
@@ -168,7 +172,7 @@ router.put("/:id", async (req, res) => {
   }
 
   const updated = await prisma.workoutEntry.update({
-    where: { id: parseInt(id) },
+    where: { id: parseInt(id), userId: req.user.id },
     data: { minutes },
     include: { workout: true },
   });
@@ -180,7 +184,7 @@ router.delete("/:id", async (req, res) => {
   const { id } = req.params;
 
   await prisma.workoutEntry.delete({
-    where: { id: parseInt(id) },
+    where: { id: parseInt(id), userId: req.user.id },
   });
 
   res.send({ message: "Workout log deleted" });

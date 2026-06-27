@@ -2,8 +2,10 @@ import express from "express";
 
 import prisma from "../prismaClient.js";
 import { ApiError } from "../middleware/error.js";
+import { authenticate } from "../middleware/auth.js";
 
 const router = express.Router();
+router.use(authenticate);
 
 //Swagger docs
 /**
@@ -29,7 +31,8 @@ const router = express.Router();
  *  get:
  *    tags: [DiaryEntries]
  *    summary: Lista de todos los DiaryEntries
- *    security: [] #Public endpoint
+ *    security:
+ *      - bearerAuth: []
  *    responses:
  *      200:
  *        description: Una lista de DiaryEntries
@@ -49,6 +52,7 @@ router.get("/", async (req, res) => {
   const entries = await prisma.diaryEntry.findMany({
     include: { meal: true },
     orderBy: { date: "desc" },
+    where: { userId: req.user.id },
   });
 
   res.json(entries);
@@ -95,7 +99,7 @@ router.get("/", async (req, res) => {
  */
 
 router.post("/", async (req, res) => {
-  const { mealId, grams, section, userId } = req.body ?? {};
+  const { mealId, grams, section } = req.body ?? {};
 
   if (mealId == null || grams == null || !section) {
     throw new ApiError(400, "mealId, grams and section are required");
@@ -105,7 +109,7 @@ router.post("/", async (req, res) => {
       mealId,
       grams,
       section,
-      userId: userId ?? 1,
+      userId: req.user.id,
     },
 
     include: { meal: true },
@@ -171,7 +175,7 @@ router.put("/:id", async (req, res) => {
   }
 
   const updated = await prisma.diaryEntry.update({
-    where: { id: parseInt(id) },
+    where: { id: parseInt(id), userId: req.user.id },
     data: { grams, section },
     include: { meal: true },
   });
@@ -183,7 +187,7 @@ router.delete("/:id", async (req, res) => {
   const { id } = req.params;
 
   await prisma.diaryEntry.delete({
-    where: { id: parseInt(id) },
+    where: { id: parseInt(id), userId: req.user.id },
   });
 
   res.send({ message: "Log deleted" });

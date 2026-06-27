@@ -12,6 +12,16 @@ datasource db {
   provider = "postgresql"
 }
 
+model User {
+  id             Int            @id @default(autoincrement())
+  email          String         @unique
+  passwordHash   String
+  role           Role           @default(USER)
+  createdAt      DateTime       @default(now())
+  diaryEntries   DiaryEntry[]
+  workoutEntries WorkoutEntry[]
+}
+
 model Meal {
   id       Int          @id @default(autoincrement())
   name     String       @unique
@@ -25,6 +35,7 @@ model Meal {
 model DiaryEntry {
   id      Int      @id @default(autoincrement())
   userId  Int
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   mealId  Int
   meal    Meal     @relation(fields: [mealId], references: [id])
   grams   Decimal  @db.Decimal(10, 2)
@@ -43,6 +54,7 @@ model Workout {
 model WorkoutEntry {
   id        Int      @id @default(autoincrement())
   userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   workoutId Int
   workout   Workout  @relation(fields: [workoutId], references: [id])
   minutes   Decimal  @db.Decimal(10, 2)
@@ -54,4 +66,9 @@ enum Section {
   LUNCH
   DINNER
   SNACKS
+}
+
+enum Role {
+  USER
+  ADMIN
 }
