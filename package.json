@@ -4,7 +4,7 @@
   "description": "Node.JS API with Express, Docker, Prisma for Vita-App Testing ",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "tsx --env-file=.env --experimental-strip-types ./src/server.js",
     "dev": "tsx --watch --env-file=.env --experimental-strip-types ./src/server.js"
   },
   "keywords": [],
